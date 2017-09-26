@@ -11,6 +11,7 @@ public class CherryServer {
     private static Server servidor;
     
     public static void main(String[] args) {
+        System.setProperty("https.protocols", "SSLv3");
         CherryServer.createServer();
         //servidor.killServer();
     }
