@@ -16,6 +16,7 @@ import java.util.Calendar;
 public class ConnectionProcess implements Runnable{
     
     private ServerSocket server;
+    private final String CONTENT_TYPE = "Content-Type: text/html";
     @Override
     public void run() {
         this.startAcceptConnection(this.server);
@@ -24,17 +25,16 @@ public class ConnectionProcess implements Runnable{
     public ConnectionProcess(ServerSocket socket) {
         this.server = socket;
     }
-    
-    
+
     private void startAcceptConnection(ServerSocket socket){
         while(true){
             Log.v("Aguardando");
             try(Socket clientSocket = socket.accept()){
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
                 out.println("HTTP/1.1 200 OK");
-                out.println("Content-Type: text/html");
+                out.println(CONTENT_TYPE);
                 out.println("\r\n");
-                try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\08009247\\Documents\\NetBeansProjects\\CherryServer\\dist\\app\\index.html"))) {
+                try (BufferedReader br = new BufferedReader(new FileReader(Settings.PATH_RENDER))) {
                     String line;
                     while ((line = br.readLine()) != null) {
                         out.println(line);
