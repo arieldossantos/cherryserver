@@ -1,9 +1,8 @@
 package cherryserver.server;
 
 import cherryserver.logger.Log;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.PrintWriter;
+
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
@@ -16,6 +15,11 @@ import java.util.Calendar;
 public class ConnectionProcess implements Runnable{
     
     private ServerSocket server;
+    private final String CONTENT_TYPE = "Content-Type: text/html";
+    private final String COMMAND_PHP = "php";
+    private final char SEPARATOR_SPC = ' ';
+    private static String path;
+
     @Override
     public void run() {
         this.startAcceptConnection(this.server);
@@ -24,18 +28,69 @@ public class ConnectionProcess implements Runnable{
     public ConnectionProcess(ServerSocket socket) {
         this.server = socket;
     }
-    
-    
+
+    private class HeaderHolder {
+
+        Reader reader;
+        String tempData = "";
+        public String METHOD = null;
+        public String URI = null;
+        public String STATUS = null;
+
+        public HeaderHolder(InputStream inpStream){
+            reader = new InputStreamReader(inpStream);
+        }
+
+        private void init(){
+
+            String[] list = null;
+
+            try {
+                int c;
+                while ((c = reader.read()) != -1) {
+                    //System.out.print((char) c);
+                    tempData += (char) c;
+                    list = tempData.split("\n");
+
+                    if (tempData.contains("\r\n\r\n"))
+                        break;
+                }
+            } catch (IOException ex) {
+                Log.e(ex.getMessage());
+            }
+
+            /* Set value holder */
+            this.METHOD = list[0].split(" ")[0];
+            this.URI = list[0].split(" ")[1];
+            this.STATUS = list[0].split(" ")[2];
+        }
+
+        public HeaderHolder getHeaders(){
+            init();
+            return this;
+        }
+    }
+
     private void startAcceptConnection(ServerSocket socket){
         while(true){
             Log.v("Aguardando");
             try(Socket clientSocket = socket.accept()){
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
                 out.println("HTTP/1.1 200 OK");
-                out.println("Content-Type: text/html");
+                out.println(CONTENT_TYPE);
                 out.println("\r\n");
-                try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\08009247\\Documents\\NetBeansProjects\\CherryServer\\dist\\app\\index.html"))) {
+
+                /* Headers */
+                InputStream inp = clientSocket.getInputStream();
+                HeaderHolder headers = new HeaderHolder(inp).getHeaders();
+
+                System.out.println("URI: " + headers.URI);
+                System.out.println("METHOD: " + headers.METHOD);
+                System.out.println("STATUS: " + headers.STATUS);
+
+                try (BufferedReader br = new BufferedReader(new FileReader(Settings.PATH_RENDER))) {
                     String line;
+
                     while ((line = br.readLine()) != null) {
                         out.println(line);
                     }
