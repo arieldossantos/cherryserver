@@ -1,2 +1,3 @@
-# cherryserver
-Servidor HTML baseado em Java
+cherryserver
+===================
+HTTP Server based in JAVA
