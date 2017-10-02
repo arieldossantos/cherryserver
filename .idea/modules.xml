@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/cherryserver1.iml" filepath="$PROJECT_DIR$/cherryserver1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/cherryserver.iml" filepath="$PROJECT_DIR$/.idea/cherryserver.iml" />
     </modules>
   </component>
 </project>
