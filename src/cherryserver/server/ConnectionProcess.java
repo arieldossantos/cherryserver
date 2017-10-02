@@ -72,8 +72,7 @@ public class ConnectionProcess implements Runnable{
     }
 
     private void startAcceptConnection(ServerSocket socket){
-        while(true){
-            Log.v("Aguardando");
+        while(Settings.SERVER_IS_RUNNING){
             try(Socket clientSocket = socket.accept()){
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
                 out.println("HTTP/1.1 200 OK");
@@ -84,9 +83,9 @@ public class ConnectionProcess implements Runnable{
                 InputStream inp = clientSocket.getInputStream();
                 HeaderHolder headers = new HeaderHolder(inp).getHeaders();
 
-                System.out.println("URI: " + headers.URI);
-                System.out.println("METHOD: " + headers.METHOD);
-                System.out.println("STATUS: " + headers.STATUS);
+                Log.v("URI: " + headers.URI);
+                Log.v("METHOD: " + headers.METHOD);
+                Log.v("STATUS: " + headers.STATUS);
 
                 try (BufferedReader br = new BufferedReader(new FileReader(Settings.PATH_RENDER))) {
                     String line;
